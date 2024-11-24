@@ -1,31 +1,31 @@
-FROM node:12-alpine AS updated-node-alpine
+# Base image updated to Node.js 20-alpine
+FROM node:20-alpine AS updated-node-alpine
 
 RUN apk update && apk upgrade
 
 #
-# The preparation stage for use during the installation
-# of app dependencies.
+# The preparation stage for use during the installation of app dependencies
 #
 FROM updated-node-alpine AS build-ready
 
 RUN apk add --no-cache git openssh
 
 #
-# Install depencencies from package.json
+# Install dependencies from package.json
 #
-FROM build-ready AS app-js-depencencies
+FROM build-ready AS app-js-dependencies
 
 WORKDIR /build
 
 COPY package*.json ./
 
-RUN npm config set unsafe-perm true
-RUN npm i --silent --quiet
+# Install dependencies. Removed unsafe-perm since it's unnecessary in Node.js 20
+RUN npm install --silent --quiet
 
 #
-# Transpiling (development).
+# Transpiling (development)
 #
-FROM app-js-depencencies AS app-development-build
+FROM app-js-dependencies AS app-development-build
 
 COPY tsconfig.json ./
 COPY ./src ./src
@@ -34,9 +34,9 @@ COPY .env.example ./.env
 RUN npm run build:dev
 
 #
-# Transpiling (production).
+# Transpiling (production)
 #
-FROM app-js-depencencies AS app-production-build
+FROM app-js-dependencies AS app-production-build
 
 COPY tsconfig.prod.json ./
 COPY ./src ./src
@@ -45,33 +45,36 @@ COPY .env.production ./.env
 RUN npm run build
 
 #
-# Removing non-production dependencies from node_modules.
+# Removing non-production dependencies from node_modules
 #
 FROM app-production-build AS production-js-dependencies
 
 RUN npm prune --production
 
 #
-# Building game server image (development).
+# Building game server image (development)
 #
-FROM updated-node-alpine as development-image
+FROM updated-node-alpine AS development-image
 
-# Install uWebSockets deps.
+# Install uWebSockets dependencies
 RUN apk add --no-cache gcompat
 RUN rm -rf /var/cache/apk/*
 
 WORKDIR /app
 
+# Create necessary directories
 RUN mkdir logs && chown -R node: logs
 RUN mkdir cache && chown -R node: cache
 RUN mkdir certs && chown -R node: certs
 
+# Copy files from previous build stages
 COPY --from=app-development-build /build/dist ./dist
-COPY --from=app-js-depencencies /build/node_modules ./node_modules
+COPY --from=app-js-dependencies /build/node_modules ./node_modules
 COPY --chown=node:node ./admin ./admin
 COPY --chown=node:node ./data ./data
 COPY package.json ./
 
+# Development environment variables
 ARG NODE_ENV=development
 ENV NODE_ENV=${NODE_ENV}
 
@@ -114,7 +117,7 @@ ENV MODERATION_PANEL_URL_ROUTE=${MODERATION_PANEL_URL_ROUTE}
 ARG SU_PASSWORD=
 ENV SU_PASSWORD=${SU_PASSWORD}
 
-ARG MAX_PLAYERS_PER_IP=3
+ARG MAX_PLAYERS_PER_IP=
 ENV MAX_PLAYERS_PER_IP=${MAX_PLAYERS_PER_IP}
 
 ARG BOTS_IP=127.0.0.1
@@ -140,33 +143,36 @@ ENV WEBSOCKETS_COMPRESSION=${WEBSOCKETS_COMPRESSION}
 
 ENV EXPERIMENTAL_FASTCALL=1
 
+# Expose port and set user
 EXPOSE ${PORT}
-
 USER node
 
 CMD [ "node", "./dist/app.js" ]
 
 #
-# Building game server image (production).
+# Building game server image (production)
 #
-FROM updated-node-alpine as production-image
+FROM updated-node-alpine AS production-image
 
-# Install uWebSockets deps.
+# Install uWebSockets dependencies
 RUN apk add --no-cache gcompat
 RUN rm -rf /var/cache/apk/*
 
 WORKDIR /app
 
+# Create necessary directories
 RUN mkdir logs && chown -R node: logs
 RUN mkdir cache && chown -R node: cache
 RUN mkdir certs && chown -R node: certs
 
+# Copy files from previous build stages
 COPY --from=app-production-build /build/dist ./dist
 COPY --from=production-js-dependencies /build/node_modules ./node_modules
 COPY --chown=node:node ./admin ./admin
 COPY --chown=node:node ./data ./data
 COPY package.json ./
 
+# Production environment variables
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
@@ -209,7 +215,7 @@ ENV MODERATION_PANEL_URL_ROUTE=${MODERATION_PANEL_URL_ROUTE}
 ARG SU_PASSWORD=
 ENV SU_PASSWORD=${SU_PASSWORD}
 
-ARG MAX_PLAYERS_PER_IP=3
+ARG MAX_PLAYERS_PER_IP=
 ENV MAX_PLAYERS_PER_IP=${MAX_PLAYERS_PER_IP}
 
 ARG BOTS_IP=127.0.0.1
@@ -232,8 +238,8 @@ ENV WEBSOCKETS_COMPRESSION=${WEBSOCKETS_COMPRESSION}
 
 ENV EXPERIMENTAL_FASTCALL=1
 
+# Expose port and set user
 EXPOSE ${PORT}
-
 USER node
 
 CMD [ "node", "./dist/app.js" ]
