@@ -1,0 +1,5 @@
+docker build --target production-image --pull -t airbattle-server .
+
+// ADD FOLDER PATH FOR LOGS AND DATA, SUBMIT PORTS AND SET GAMETYPE AND SU PASSWORD 
+// FFA1, NO DAMAGE SERVER
+docker run -v c:/ab-server/logs:/app/logs -v c:/ab-server/data:/app/data -p 4000:3501 -e SERVER_TYPE=FFA -e SU_PASSWORD=Mypassword airbattle-server
