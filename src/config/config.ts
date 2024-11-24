@@ -693,10 +693,10 @@ const config: GameServerConfigInterface = {
 
   ffa: {
     spawnZoneName: strValue(process.env.FFA_SPAWN_ZONE_NAME, FFA_DEFAULT_SPAWN_ZONE),
-    baseInfernos: boolValue(process.env.FFA_BASE_INFERNOS, false),
-    enableFlag: boolValue(process.env.FFA_ENABLE_FLAG, false),
-    tdmMode: boolValue(process.env.FFA_TDM_MODE, false),
-    enableTeams: boolValue(process.env.FFA_ENABLE_TEAMS, false),
+    baseInfernos: boolValue(process.env.FFA_BASE_INFERNOS, true),
+    enableFlag: boolValue(process.env.FFA_ENABLE_FLAG, true),
+    tdmMode: boolValue(process.env.FFA_TDM_MODE, true),
+    enableTeams: boolValue(process.env.FFA_ENABLE_TEAMS, true),
   },
 
   btr: {
@@ -705,7 +705,7 @@ const config: GameServerConfigInterface = {
   },
 
   skins: {
-    enable: boolValue(process.env.SKINS_ENABLE, false),
+    enable: boolValue(process.env.SKINS_ENABLE, true),
     minUserLevel: intValue(process.env.SKINS_MIN_USER_LEVEL, 20),
   },
 };
