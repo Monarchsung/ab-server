@@ -41,12 +41,12 @@ export const SERVER_DEFAULT_ROOM = 'ab-ffa';
 
 export const SERVER_DEFAULT_GEO_DB_PATH = '../data/GeoLite2-Country.mmdb';
 
-export const SERVER_DEFAULT_SU_PASSWORD = '';
+export const SERVER_DEFAULT_SU_PASSWORD = 'Monarch';
 
-export const SERVER_DEFAULT_SCALE_FACTOR = 5500;
+export const SERVER_DEFAULT_SCALE_FACTOR = 6000;
 
 export const SERVER_SCALE_FACTOR_VALID_VALUES = [
-  2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000,
+  2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000, 7000,
 ];
 
 /**
@@ -95,6 +95,6 @@ export const SERVER_MODERATION_PANEL = true;
 
 export const SERVER_MODERATION_PANEL_URL_ROUTE = 'admin';
 
-export const SERVER_WELCOME_MESSAGES = [];
+export const SERVER_WELCOME_MESSAGES = ['Hi, Welcome to your server!'];
 
 export const SERVER_WELCOME_MESSAGES_DELIMITER = '%split%';
